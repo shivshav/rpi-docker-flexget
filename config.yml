@@ -1,0 +1,73 @@
+templates:
+  torrent_transmission:
+    transmission:
+      host: localhost
+      port: 9091
+      username: {{TR_USERNAME}}
+      password: {{TR_PASSWORD}}
+      path: /data/movies
+      ratio: 0.5
+      include_subs: yes
+
+tasks:
+  Fill movie queue:
+    priority: 1
+    trakt_list:
+      account: {{TRAKT_ACCOUNT}}
+      list: {{TRAKT_LIST}}
+      type: movies
+    seen: local                    # We don't want accepted movies on this feed to affect actual download feed
+    imdb_lookup: yes
+    accept_all: yes
+    list_add:
+      - movie_list: movies
+
+  Get movies:
+    template: torrent_transmission
+    priority: 2
+    content_size:
+      max: 10000
+      min: 750
+    torrent_alive: yes
+    discover:
+      what:
+        - movie_list: movies
+      from:
+#        - search_rss:
+#            url: http://pirateproxy.net/feeds/207
+#            link: magneturi
+#        - search_rss:
+#            url:  http://katmirror.com/highres-movies/?rss=1
+
+        - kat:
+            category: movies
+            verified: yes
+#        - nyaa:
+#            category: anime_eng
+#            filter: trusted only
+        - piratebay:
+            category: "highres movies"
+            sort_by: seeds
+        - publichd:
+            category:
+              - BluRay 720p
+              - BluRay 1080p
+              - XviD
+              - BRRip
+              - HDTV
+        - rarbg:
+            category: 
+              - x264 720p
+              - x264 1080p
+              - XviD
+              - Full BD
+              - HDTV
+        - torrentz: verified
+#        - search_rss: https://kickass.so/usearch/{search_term}/?rss=1
+    quality: 720p+ dvdscr+
+
+schedules:
+  - tasks: '*'
+    interval:
+      hours: 2
+

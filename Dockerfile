@@ -1,11 +1,16 @@
 FROM hypriot/rpi-python
 MAINTAINER Shivneil Prasad <sprasad0603@gmail.com>
 
-RUN pip install setuptools 
+# Pip and setuptools must be upgraded separately for some reason
 RUN pip install -U pip 
+RUN pip install -U setuptools
 RUN pip install flexget
 
 RUN mkdir -p /data/flexget
+
+COPY config.yml /data/flexget/
+
+COPY first-run.sh flexget-start.sh /
 
 VOLUME /data/flexget
 # FGUSER
@@ -13,4 +18,4 @@ VOLUME /data/flexget
 # LOG
 # LEVEL
 
-ENTRYPOINT ["/usr/local/bin/flexget", "--", "-c", "/data/flexget/config.yml", "daemon", "start"]
+ENTRYPOINT ["/flexget-start.sh"]
