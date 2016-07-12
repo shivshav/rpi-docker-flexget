@@ -3,6 +3,7 @@
 CONFIG=/data/flexget/config.yml
 
 TRAKT_LIST=${TRAKT_LIST:-watchlist}
+SKIP_TRAKT_AUTH=${SKIP_TRAKT_AUTH:-true}
 
 if [[ -z "$TR_USERNAME" || -z "$TR_PASSWORD" || -z "$TRAKT_ACCOUNT" ]]; then
     echo "No values given for transmission and trakt access. Recommend recreating container with '\$TR_USERNAME', '\$TR_PASSWORD', and '\$TRAKT_ACCOUNT'  environment variables set."
@@ -14,5 +15,10 @@ sed -i "s/{{TR_PASSWORD}}/${TR_PASSWORD}/g" ${CONFIG}
 sed -i "s/{{TRAKT_ACCOUNT}}/${TRAKT_ACCOUNT}/g" ${CONFIG}
 sed -i "s/{{TRAKT_LIST}}/${TRAKT_LIST}/g" ${CONFIG}
 
+# Requesting trakt authorization
+if [[ ! -z "$TRAKT_ACCOUNT" && $SKIP_TRAKT_AUTH = false ]]; then
+    echo "Initiating trakt authorization. This command will not proceed until auth is granted by trakt to flexget."
+    /usr/local/bin/flexget -c /data/flexget/config.yml trakt auth ${TRAKT_ACCOUNT}
+fi
 echo "Initial setup finished"
 rm /first-run.sh
