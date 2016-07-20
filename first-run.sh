@@ -1,6 +1,8 @@
 #!/bin/bash
 
-CONFIG=/data/flexget/config.yml
+CONFIG_DIR=/data/flexget
+CONFIG=config.yml
+OVERWRITE_CONFIG=${OVERWRITE_CONFIG:-false}
 
 TRAKT_LIST=${TRAKT_LIST:-watchlist}
 SKIP_TRAKT_AUTH=${SKIP_TRAKT_AUTH:-true}
@@ -10,10 +12,16 @@ if [[ -z "$TR_USERNAME" || -z "$TR_PASSWORD" || -z "$TRAKT_ACCOUNT" ]]; then
     exit 1
 fi
 
-sed -i "s/{{TR_USERNAME}}/${TR_USERNAME}/g" ${CONFIG}
-sed -i "s/{{TR_PASSWORD}}/${TR_PASSWORD}/g" ${CONFIG}
-sed -i "s/{{TRAKT_ACCOUNT}}/${TRAKT_ACCOUNT}/g" ${CONFIG}
-sed -i "s/{{TRAKT_LIST}}/${TRAKT_LIST}/g" ${CONFIG}
+# Check for the presence of a configuration file
+if [[ ! -f $CONFIG_DIR/$CONFIG || "$OVERWRITE_CONFIG" = true ]]; then
+    cp /${CONFIG}.template $CONFIG_DIR/$CONFIG
+    sed -i "s/{{TR_USERNAME}}/${TR_USERNAME}/g" ${CONFIG_DIR}/${CONFIG}
+    sed -i "s/{{TR_PASSWORD}}/${TR_PASSWORD}/g" ${CONFIG_DIR}/${CONFIG}
+    sed -i "s/{{TRAKT_ACCOUNT}}/${TRAKT_ACCOUNT}/g" ${CONFIG_DIR}/${CONFIG}
+    sed -i "s/{{TRAKT_LIST}}/${TRAKT_LIST}/g" ${CONFIG_DIR}/${CONFIG}
+else
+    echo "Configuration file will not be overwritten on volume"
+fi
 
 # Requesting trakt authorization
 if [[ ! -z "$TRAKT_ACCOUNT" && $SKIP_TRAKT_AUTH = false ]]; then

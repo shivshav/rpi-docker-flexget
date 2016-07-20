@@ -18,9 +18,7 @@ RUN pip install flexget transmissionrpc
 
 RUN mkdir -p /data/flexget
 
-COPY config.yml /data/flexget/
-
-COPY first-run.sh flexget-start.sh /
+COPY first-run.sh flexget-start.sh config.yml.template /
 
 VOLUME /data/flexget
 # FGUSER
