@@ -12,9 +12,9 @@ RUN apt-get update && apt-get install -y \
 
 # After upgrading pip, pip PATH gets misconfigured so we must provide full path to insitigate another install
 # For some dependency reason, they must be upgraded separately
-RUN pip install -U pip && /usr/local/bin/pip install -U setuptools
+RUN pip install -U pip && /usr/local/bin/pip install -U setuptools urllib3[secure]
 
-RUN pip install flexget urllib3[secure]
+RUN pip install flexget transmissionrpc
 
 RUN mkdir -p /data/flexget
 
