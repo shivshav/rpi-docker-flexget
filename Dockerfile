@@ -16,11 +16,12 @@ RUN pip install -U pip && /usr/local/bin/pip install -U setuptools urllib3[secur
 
 RUN pip install flexget transmissionrpc
 
-RUN mkdir -p /data/flexget
+RUN mkdir -p /data/sorted/movies /data/config /data/completed_downloads/movies
 
 COPY first-run.sh flexget-start.sh config.yml.template /
 
-VOLUME /data/flexget
+VOLUME /data/sorted/movies /data/config /data/completed_downloads/movies
+
 # FGUSER
 # CONFIG
 # LOG

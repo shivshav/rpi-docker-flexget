@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONFIG_DIR=/data/flexget
+CONFIG_DIR=/data/config
 CONFIG=config.yml
 OVERWRITE_CONFIG=${OVERWRITE_CONFIG:-false}
 
@@ -26,7 +26,7 @@ fi
 # Requesting trakt authorization
 if [[ ! -z "$TRAKT_ACCOUNT" && $SKIP_TRAKT_AUTH = false ]]; then
     echo "Initiating trakt authorization. This command will not proceed until auth is granted by trakt to flexget."
-    /usr/local/bin/flexget -c /data/flexget/config.yml trakt auth ${TRAKT_ACCOUNT}
+    /usr/local/bin/flexget -c $CONFIG_DIR/$CONFIG trakt auth ${TRAKT_ACCOUNT}
 fi
 echo "Initial setup finished"
 rm /first-run.sh

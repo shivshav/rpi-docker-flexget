@@ -5,12 +5,10 @@ templates:
       port: 9091
       username: {{TR_USERNAME}}
       password: {{TR_PASSWORD}}
-      path: /data/movies
       ratio: 0.5
-      include_subs: yes
 
 tasks:
-  Fill movie queue:
+  get-trakt-movies:
     priority: 1
     trakt_list:
       account: {{TRAKT_ACCOUNT}}
@@ -22,7 +20,7 @@ tasks:
     list_add:
       - movie_list: movies
 
-  Get movies:
+  torrent-movies:
     template: torrent_transmission
     priority: 2
     content_size:
@@ -65,9 +63,35 @@ tasks:
         - torrentz: verified
 #        - search_rss: https://kickass.so/usearch/{search_term}/?rss=1
     quality: 720p+ dvdscr+
+    set:
+      magnetization_timeout: 30
+      trakt_lookup: yes
+      path: /data/completed_downloads/movies
+      main_file_only: yes
+      include_subs: yes
+      skip_files:
+        - '*.nfo'
+        - '*.sfv'
+        - '*[sS](/sS)ample*'
+        - '*.txt'
+      content_filename: "{{ trakt_movie_name }} - {{ trakt_movie_year }}"
+      rename_like_files: yes
+
+  sort-movies:
+    priority: 3
+    filesystem:
+      path: /data/completed_downloads/movies
+      mask: '*.*'
+      retrieve:
+        - files
+      recursive: yes
+    seen: local                    # We don't want accepted movies on this feed to affect actual download feed
+    accept_all: yes
+    trakt_lookup: yes
+    move:
+      to: /data/sorted/movies/"{{ trakt_movie_name }} - {{ trakt_movie_year }}"/
 
 schedules:
   - tasks: '*'
     interval:
       hours: 2
-
