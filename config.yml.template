@@ -1,7 +1,7 @@
 templates:
   torrent_transmission:
     transmission:
-      host: localhost
+      host: transmission
       port: 9091
       username: {{TR_USERNAME}}
       password: {{TR_PASSWORD}}
@@ -15,8 +15,12 @@ tasks:
       list: {{TRAKT_LIST}}
       type: movies
     seen: local                    # We don't want accepted movies on this feed to affect actual download feed
-    imdb_lookup: yes
     accept_all: yes
+    trakt_lookup:
+      username: {{TRAKT_ACCOUNT}}
+    if:
+     - trakt_watched: reject
+     - trakt_collected: reject
     list_add:
       - movie_list: movies
 
@@ -36,37 +40,40 @@ tasks:
 #            link: magneturi
 #        - search_rss:
 #            url:  http://katmirror.com/highres-movies/?rss=1
-
-        - kat:
-            category: movies
-            verified: yes
+#
+#        - kat:
+#            category: movies
+#            verified: yes
 #        - nyaa:
 #            category: anime_eng
 #            filter: trusted only
         - piratebay:
-            category: "highres movies"
+            category: video
             sort_by: seeds
-        - publichd:
-            category:
-              - BluRay 720p
-              - BluRay 1080p
-              - XviD
-              - BRRip
-              - HDTV
-        - rarbg:
-            category: 
-              - x264 720p
-              - x264 1080p
-              - XviD
-              - Full BD
-              - HDTV
-        - torrentz: verified
+#        - publichd:
+#            category:
+#              - BluRay 720p
+#              - BluRay 1080p
+#              - XviD
+#              - BRRip
+#              - HDTV
+#        - rarbg:
+#            category: 
+#              - x264 720p
+#              - x264 1080p
+#              - XviD
+#              - Full BD
+#              - HDTV
+#        - torrentz: verified
 #        - search_rss: https://kickass.so/usearch/{search_term}/?rss=1
     quality: 720p+ dvdscr+
+    list_match:
+      from:
+        - movie_list: movies
     set:
       magnetization_timeout: 30
       trakt_lookup: yes
-      path: /data/completed_downloads/movies
+      path: /var/lib/transmission-daemon/downloads/completed/movie
       main_file_only: yes
       include_subs: yes
       skip_files:
@@ -74,7 +81,7 @@ tasks:
         - '*.sfv'
         - '*[sS](/sS)ample*'
         - '*.txt'
-      content_filename: "{{ trakt_movie_name }} - {{ trakt_movie_year }}"
+      content_filename: '{{ movie_name }} ({{ movie_year }})'
       rename_like_files: yes
 
   sort-movies:
@@ -89,7 +96,8 @@ tasks:
     accept_all: yes
     trakt_lookup: yes
     move:
-      to: /data/sorted/movies/"{{ trakt_movie_name }} - {{ trakt_movie_year }}"/
+      to: '/data/sorted/movies/{{ trakt_movie_name }} - {{ trakt_movie_year }}/'
+      filename: '{{ trakt_movie_name }} ({{ trakt_movie_year }}){{ pathext|location }}'
 
 schedules:
   - tasks: '*'
